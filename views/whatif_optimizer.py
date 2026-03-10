@@ -5,10 +5,13 @@ import sys
 sys.path.append('..')
 from data.data_generator import generate_supply_chain_data
 from models.ml_models import WhatIfOptimizer
+from utils.translations import _
+from utils.role_helper import is_action_allowed
+import pandas as pd
 
 def show():
-    st.title("🎯 What-If Scenario Optimizer")
-    st.markdown("**Test multiple response strategies and find the optimal cost-resilience balance**")
+    st.title(_("🎯 What-If Scenario Optimizer"))
+    st.markdown(f"**{_('Test multiple response strategies and find the optimal cost-resilience balance')}**")
     
     # Load data
     data = generate_supply_chain_data()
@@ -18,28 +21,29 @@ def show():
     optimizer = WhatIfOptimizer(products_df)
     
     # Scenario configuration
-    st.markdown("### ⚙️ Configure Disruption Scenario")
+    st.markdown(f"### ⚙️ {_('Configure Disruption Scenario')}")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        delay_days = st.slider("Expected Delay (days)", 1, 21, 7, help="How many days will the disruption last?")
+        delay_days = st.slider(_("Expected Delay (days)"), 1, 21, 7, help="How many days will the disruption last?")
     
     with col2:
-        supplier_failure_prob = st.slider("Supplier Failure Probability", 0.0, 1.0, 0.5, 0.1, help="Likelihood of supplier completely failing")
+        supplier_failure_prob = st.slider(_("Supplier Failure Probability"), 0.0, 1.0, 0.5, 0.1, help="Likelihood of supplier completely failing")
     
     with col3:
-        demand_spike_pct = st.slider("Demand Spike (%)", 0, 100, 20, 5, help="Unexpected increase in customer demand")
+        demand_spike_pct = st.slider(_("Demand Spike (%)"), 0, 100, 20, 5, help="Unexpected increase in customer demand")
     
     st.markdown(f"""
     <div style='background: #1a1a2e; padding: 20px; border-radius: 10px; margin: 20px 0;'>
-        <h4 style='color: #00d4ff; margin-top: 0;'>Scenario Summary</h4>
+        <h4 style='color: #00d4ff; margin-top: 0;'>{_('Scenario Summary')}</h4>
         <p style='color: white; margin: 5px 0;'>A <strong>{delay_days}-day</strong> disruption with <strong>{supplier_failure_prob*100:.0f}%</strong> chance of complete supplier failure and <strong>{demand_spike_pct}%</strong> demand increase</p>
     </div>
     """, unsafe_allow_html=True)
     
     # Run optimization
-    if st.button("🚀 Optimize Strategy", type="primary"):
+    can_simulate = is_action_allowed('simulate')
+    if st.button(f"🚀 {_('Optimize Strategy')}", type="primary", disabled=not can_simulate):
         with st.spinner("Analyzing strategies and calculating optimal response..."):
             result = optimizer.optimize_strategy(delay_days, supplier_failure_prob, demand_spike_pct)
         
@@ -50,20 +54,20 @@ def show():
         result = st.session_state['optimization_result']
         
         st.markdown("---")
-        st.markdown("### 📊 Strategy Comparison")
+        st.markdown(f"### 📊 {_('Strategy Comparison')}")
         
         # Baseline cost
         baseline_cr = result['baseline_cost'] / 10000000
         st.markdown(f"""
         <div style='background: linear-gradient(135deg, #5f1e1e 0%, #7b2d2d 100%); padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0;'>
-            <h3 style='color: #ff6b6b; margin: 0;'>Baseline Cost (Do Nothing)</h3>
+            <h3 style='color: #ff6b6b; margin: 0;'>{_('Baseline Cost (Do Nothing)')}</h3>
             <h1 style='color: white; margin: 10px 0; font-size: 3em;'>₹{baseline_cr:.2f} Cr</h1>
-            <p style='color: #ffcccc; margin: 0;'>Total revenue loss if no action is taken</p>
+            <p style='color: #ffcccc; margin: 0;'>{_('Total revenue loss if no action is taken')}</p>
         </div>
         """, unsafe_allow_html=True)
         
         # Strategy cards
-        st.markdown("### 🎯 Available Strategies")
+        st.markdown(f"### 🎯 {_('Available Strategies')}")
         
         strategies = result['strategies']
         
@@ -75,7 +79,7 @@ def show():
             # Color based on rank
             if i == 0:
                 border_color = "#44ff44"
-                badge = "⭐ RECOMMENDED"
+                badge = f"⭐ {_('RECOMMENDED')}"
                 badge_color = "#44ff44"
             else:
                 border_color = "#00d4ff"
@@ -89,10 +93,10 @@ def show():
                 <div style='background: #1a1a2e; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 5px solid {border_color};'>
                     <div style='display: flex; justify-content: space-between; align-items: center;'>
                         <div>
-                            <h3 style='color: {badge_color}; margin: 0;'>{strategy['name']} {badge}</h3>
-                            <p style='color: #a0a0a0; margin: 10px 0;'>{strategy['description']}</p>
-                            <p style='color: white; margin: 5px 0;'>Implementation Time: <strong>{strategy['implementation_time']}</strong></p>
-                            <p style='color: white; margin: 5px 0;'>Resilience Score: <strong>{strategy['resilience_score']*100:.0f}%</strong></p>
+                            <h3 style='color: {badge_color}; margin: 0;'>{_(strategy['name'])} {badge}</h3>
+                            <p style='color: #a0a0a0; margin: 10px 0;'>{_(strategy['description'])}</p>
+                            <p style='color: white; margin: 5px 0;'>{_('Implementation Time:')} <strong>{_(strategy['implementation_time'])}</strong></p>
+                            <p style='color: white; margin: 5px 0;'>{_('Resilience Score:')} <strong>{strategy['resilience_score']*100:.0f}%</strong></p>
                         </div>
                         <div style='text-align: right;'>
                             <h2 style='color: {badge_color}; margin: 0;'>₹{cost_cr:.2f}Cr</h2>
@@ -132,7 +136,7 @@ def show():
         
         # Comparison chart
         st.markdown("---")
-        st.markdown("### 📈 Cost vs Resilience Analysis")
+        st.markdown(f"### 📈 {_('Cost vs Resilience Analysis')}")
         
         col1, col2 = st.columns(2)
         
@@ -155,7 +159,7 @@ def show():
                               annotation_text="Baseline (Do Nothing)", annotation_position="right")
             
             fig_cost.update_layout(
-                title="Total Cost Comparison",
+                title=_("Total Cost Comparison"),
                 xaxis_title="Strategy",
                 yaxis_title="Cost (₹ Crores)",
                 paper_bgcolor='#0e1117',
@@ -181,7 +185,7 @@ def show():
             ])
             
             fig_resilience.update_layout(
-                title="Resilience Score Comparison",
+                title=_("Resilience Score Comparison"),
                 xaxis_title="Strategy",
                 yaxis_title="Resilience Score (%)",
                 paper_bgcolor='#0e1117',
@@ -193,7 +197,7 @@ def show():
             st.plotly_chart(fig_resilience, use_container_width=True)
         
         # Scatter plot: Cost vs Resilience
-        st.markdown("### 🎯 Optimal Strategy Selection")
+        st.markdown(f"### 🎯 {_('Optimal Strategy Selection')}")
         
         fig_scatter = go.Figure()
         
@@ -235,26 +239,86 @@ def show():
         
         st.markdown(f"""
         <div style='background: linear-gradient(135deg, #1e5f1e 0%, #2d7b2d 100%); padding: 30px; border-radius: 15px; margin: 30px 0; border: 3px solid #44ff44;'>
-            <h2 style='color: #44ff44; margin-top: 0; text-align: center;'>⭐ RECOMMENDED STRATEGY</h2>
-            <h1 style='color: white; text-align: center; font-size: 2.5em; margin: 20px 0;'>{recommended['name']}</h1>
+            <h2 style='color: #44ff44; margin-top: 0; text-align: center;'>⭐ {_('Recommended Strategy').upper()}</h2>
+            <h1 style='color: white; text-align: center; font-size: 2.5em; margin: 20px 0;'>{_(recommended['name'])}</h1>
             <div style='display: flex; justify-content: space-around; margin: 20px 0;'>
                 <div style='text-align: center;'>
                     <h3 style='color: white; margin: 0;'>₹{recommended['cost']/10000000:.2f} Cr</h3>
-                    <p style='color: #ccffcc; margin: 5px 0;'>Total Cost</p>
+                    <p style='color: #ccffcc; margin: 5px 0;'>{_('Total Cost')}</p>
                 </div>
                 <div style='text-align: center;'>
                     <h3 style='color: white; margin: 0;'>{recommended['resilience_score']*100:.0f}%</h3>
-                    <p style='color: #ccffcc; margin: 5px 0;'>Resilience</p>
+                    <p style='color: #ccffcc; margin: 5px 0;'>{_('Resilience')}</p>
                 </div>
                 <div style='text-align: center;'>
                     <h3 style='color: white; margin: 0;'>₹{savings/10000000:.2f} Cr</h3>
-                    <p style='color: #ccffcc; margin: 5px 0;'>Savings ({savings_pct:.1f}%)</p>
+                    <p style='color: #ccffcc; margin: 5px 0;'>{_('Savings')} ({savings_pct:.1f}%)</p>
                 </div>
             </div>
-            <p style='color: white; text-align: center; font-size: 1.1em; margin: 20px 0;'>{recommended['description']}</p>
-            <p style='color: #ccffcc; text-align: center;'>Implementation Time: <strong>{recommended['implementation_time']}</strong></p>
+            <p style='color: white; text-align: center; font-size: 1.1em; margin: 20px 0;'>{_(recommended['description'])}</p>
+            <p style='color: #ccffcc; text-align: center;'>{_('Implementation Time:')} <strong>{_(recommended['implementation_time'])}</strong></p>
         </div>
         """, unsafe_allow_html=True)
+        
+        # --- FEATURE 2: INVENTORY OPTIMIZATION ---
+        st.markdown("---")
+        st.markdown("### 📦 Inventory Optimization")
+        
+        if st.button("Run Inventory Optimization", disabled=not can_simulate):
+            with st.spinner("Analyzing inventory levels and computing optimal safety stock..."):
+                inv_data = []
+                Z = 1.65 # 95% service level
+                deps_df = data['dependencies']
+                
+                for idx, product in products_df.iterrows():
+                    avg_demand = product['monthly_volume']
+                    sigma_demand = 0.15 * avg_demand
+                    
+                    # Find max lead time from suppliers for this product
+                    # E.g. 'Cotton Knitwear' might just loosely match 'Knitwear' in dependencies_df
+                    p_deps = deps_df[deps_df['product'].apply(lambda x: x in product['name'] or product['name'] in x)]
+                    if not p_deps.empty:
+                        lead_time = p_deps['lead_time'].max()
+                    else:
+                        lead_time = 5 # fallback
+                        
+                    lt_months = lead_time / 30.0
+                    if lt_months <= 0: lt_months = 0.1
+                    
+                    opt_ss = int(Z * sigma_demand * (lt_months ** 0.5))
+                    curr_ss = int(0.05 * avg_demand) # current assumed as 5% of monthly
+                    diff = opt_ss - curr_ss
+                    
+                    curr_prob = "30%" if curr_ss < opt_ss else "5%"
+                    opt_prob = "5%"
+                    
+                    inv_data.append({
+                        "Product": product['name'],
+                        "Current Safety Stock (units)": curr_ss,
+                        "Recommended (units)": opt_ss,
+                        "Difference": f"+{diff}" if diff > 0 else str(diff),
+                        "Stock-out Probability (current)": curr_prob,
+                        "Stock-out Probability (optimized)": opt_prob
+                    })
+                    
+                inv_df = pd.DataFrame(inv_data)
+                
+                st.markdown("#### Safety Stock Analysis")
+                st.dataframe(inv_df, use_container_width=True)
+                
+                # Bar chart
+                fig_inv = go.Figure(data=[
+                    go.Bar(name='Current Stock', x=inv_df['Product'], y=inv_df['Current Safety Stock (units)'], marker_color='#ffaa00'),
+                    go.Bar(name='Recommended Stock', x=inv_df['Product'], y=inv_df['Recommended (units)'], marker_color='#00d4ff')
+                ])
+                fig_inv.update_layout(
+                    barmode='group',
+                    title="Current vs Recommended Safety Stock",
+                    paper_bgcolor='#0e1117',
+                    plot_bgcolor='#1a1a2e',
+                    font=dict(color='white')
+                )
+                st.plotly_chart(fig_inv, use_container_width=True)
     
     else:
         st.info("👆 Configure your scenario and click 'Optimize Strategy' to see recommendations")

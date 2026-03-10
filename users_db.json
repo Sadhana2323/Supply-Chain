@@ -1,0 +1,268 @@
+{
+    "Sadhana G": {
+        "password_hash": "8ecd689213131a912e9d0e29d1ea0b7199969c73d1809cc11e42e0546b4ede15",
+        "email": "sadhanag2323@gmail.com",
+        "onboarded": true,
+        "company_data": {
+            "profile": {
+                "name": "Tamil Nadu Textiles Export Pvt Ltd",
+                "total_stock_value_lakhs": 850,
+                "core_products": [
+                    "Cotton Knitwear",
+                    "Home Textiles",
+                    "Garment Accessories"
+                ],
+                "key_markets": [
+                    "North America",
+                    "Europe"
+                ],
+                "avg_revenue_lakhs": 1200,
+                "investment_strategy": "Balanced"
+            },
+            "suppliers": [],
+            "inventory": [],
+            "logistics": {
+                "primary_ports": [
+                    "Chennai"
+                ],
+                "alternate_ports": [
+                    "Thoothukudi"
+                ],
+                "primary_routes": "e.g., Chennai to Singapore, Thoothukudi to Colombo",
+                "partners": "",
+                "transit_times": "Chennai-Singapore: 5 Days\nThoothukudi-Colombo: 2 Days",
+                "modal_split": {
+                    "sea": 70,
+                    "air": 10,
+                    "road": 20
+                },
+                "avg_freight_cost": 75000
+            },
+            "risk_insights": {
+                "top_customers": [
+                    "US Retail Corp - \u20b95Cr",
+                    "EU Importers - \u20b93Cr"
+                ],
+                "customer_locations": "USA, UK, Germany",
+                "late_penalty": "1.5% of order value per day",
+                "seasonal_peaks": [
+                    "Christmas",
+                    "Diwali"
+                ],
+                "past_disruptions": [
+                    "Floods",
+                    "Port Strike"
+                ],
+                "risk_tolerance": "Medium - Balanced",
+                "current_mitigations": [
+                    "Safety Stock"
+                ]
+            }
+        }
+    },
+    " G Sadhana ": {
+        "password_hash": "8ecd689213131a912e9d0e29d1ea0b7199969c73d1809cc11e42e0546b4ede15",
+        "email": "sadhanag.cse2023@citchennai.net",
+        "onboarded": false,
+        "company_data": {}
+    },
+    " Sadhana": {
+        "password_hash": "d001273013a7f1557ec36248e5d0531a9152ba44e07e9e3b3c1d7ad5463ddd91",
+        "email": "sadhanag.cse2023@citchennai.net",
+        "onboarded": false,
+        "company_data": {}
+    },
+    "Sadhana Ganapathyvel": {
+        "password_hash": "c088c858d6b03000e9a68a8c21bfe87b6a8ca44f7c294605ff09a37ecd656c30",
+        "email": "sadhhhhhhh2308@gmail.com",
+        "onboarded": true,
+        "company_data": {
+            "profile": {
+                "name": "Tamil Nadu Textiles Export Pvt Ltd",
+                "total_stock_value_lakhs": 850,
+                "core_products": [
+                    "Cotton Knitwear",
+                    "Home Textiles",
+                    "Garment Accessories"
+                ],
+                "key_markets": [
+                    "North America",
+                    "Europe"
+                ],
+                "avg_revenue_lakhs": 1200,
+                "investment_strategy": "Balanced"
+            },
+            "suppliers": [
+                {
+                    "Supplier Name": null,
+                    "Location (City, State)": null,
+                    "Supplier Tier": null,
+                    "Products Supplied": null,
+                    "Sourcing Type": null,
+                    "Historical Reliability (%)": null,
+                    "Lead Time (Days)": null,
+                    "Criticality": null
+                }
+            ],
+            "inventory": [],
+            "logistics": {
+                "primary_ports": [
+                    "Chennai"
+                ],
+                "alternate_ports": [
+                    "Thoothukudi"
+                ],
+                "primary_routes": "e.g., Chennai to Singapore, Thoothukudi to Colombo",
+                "partners": "",
+                "transit_times": "Chennai-Singapore: 5 Days\nThoothukudi-Colombo: 2 Days",
+                "modal_split": {
+                    "sea": 70,
+                    "air": 10,
+                    "road": 20
+                },
+                "avg_freight_cost": 75000
+            },
+            "risk_insights": {
+                "top_customers": [
+                    "US Retail Corp - \u20b95Cr",
+                    "EU Importers - \u20b93Cr"
+                ],
+                "customer_locations": "USA, UK, Germany",
+                "late_penalty": "1.5% of order value per day",
+                "seasonal_peaks": [
+                    "Christmas",
+                    "Diwali"
+                ],
+                "past_disruptions": [
+                    "Floods",
+                    "Port Strike"
+                ],
+                "risk_tolerance": "Medium - Balanced",
+                "current_mitigations": [
+                    "Safety Stock"
+                ]
+            }
+        }
+    },
+    "Sonakshi": {
+        "password_hash": "f151db2e2b2b3b439319bfc58d9a7ffcde657448063b8100cfdb7fe3bfdbdf94",
+        "email": "54priyavishnu@gmail.com",
+        "onboarded": false,
+        "company_data": {}
+    },
+    "Ganapathyvel": {
+        "password_hash": "c088c858d6b03000e9a68a8c21bfe87b6a8ca44f7c294605ff09a37ecd656c30",
+        "email": "kgvhotandjuicy@gmail.com",
+        "onboarded": false,
+        "company_data": {}
+    },
+    "Tamilselvi": {
+        "password_hash": "c088c858d6b03000e9a68a8c21bfe87b6a8ca44f7c294605ff09a37ecd656c30",
+        "email": "kgvhotandjuicy@gmail.com",
+        "onboarded": false,
+        "company_data": {}
+    },
+    "testuser": {
+        "password_hash": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+        "email": "test@example.com",
+        "onboarded": false,
+        "company_data": {}
+    },
+    "hackathon_judge": {
+        "password_hash": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+        "email": "judge@demo.com",
+        "onboarded": true,
+        "company_data": {
+            "profile": {
+                "name": "Demo Corp V3",
+                "total_stock_value_lakhs": 500,
+                "core_products": [
+                    "Automotive Parts"
+                ],
+                "key_markets": [
+                    "Domestic (India)",
+                    "Europe"
+                ],
+                "avg_revenue_lakhs": 2500,
+                "investment_strategy": "Balanced"
+            },
+            "suppliers": [
+                {
+                    "Supplier Name": "Chennai Auto Components",
+                    "Location (City, State)": "Chennai, Tamil Nadu",
+                    "Supplier Tier": "Tier 1 (Direct)",
+                    "Products Supplied": "Engine Parts",
+                    "Sourcing Type": "Single Source",
+                    "Historical Reliability (%)": 92,
+                    "Lead Time (Days)": 14,
+                    "Criticality": "High"
+                }
+            ],
+            "inventory": [
+                {
+                    "Warehouse Location": "Sriperumbudur Hub",
+                    "Products Stored": "Engine Parts",
+                    "Current Inventory Level": 5000,
+                    "Safety Stock Level": 1000,
+                    "Reorder Point": 1500,
+                    "Storage Capacity": 10000,
+                    "Is Perishable": false,
+                    "Shelf Life (Days)": 365
+                }
+            ],
+            "logistics": {
+                "primary_ports": [
+                    "Chennai"
+                ],
+                "alternate_ports": [
+                    "Thoothukudi"
+                ],
+                "primary_routes": "Chennai -> Europe",
+                "partners": "Maersk Line",
+                "transit_times": "21 Days",
+                "modal_split": {
+                    "sea": 80,
+                    "air": 5,
+                    "road": 15
+                },
+                "avg_freight_cost": 50000
+            },
+            "risk_insights": {
+                "top_customers": [
+                    "Volkswagen DE",
+                    "Tata Motors"
+                ],
+                "customer_locations": "Germany, India",
+                "late_penalty": "2% per day",
+                "seasonal_peaks": [
+                    "Diwali"
+                ],
+                "past_disruptions": [
+                    "Floods"
+                ],
+                "risk_tolerance": "Medium - Balanced",
+                "current_mitigations": [
+                    "Safety Stock"
+                ]
+            }
+        }
+    },
+    "Kailaas": {
+        "password_hash": "c088c858d6b03000e9a68a8c21bfe87b6a8ca44f7c294605ff09a37ecd656c30",
+        "email": "sadhanag2323@gmail.com",
+        "onboarded": false,
+        "company_data": {}
+    },
+    "test_judge": {
+        "password_hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+        "email": "judge@example.com",
+        "onboarded": false,
+        "company_data": {}
+    },
+    "tester123456": {
+        "password_hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+        "email": "judge@example.com",
+        "onboarded": false,
+        "company_data": {}
+    }
+}

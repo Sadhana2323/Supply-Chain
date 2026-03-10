@@ -3,20 +3,25 @@ import plotly.graph_objects as go
 import plotly.express as px
 from datetime import datetime
 import sys
-sys.path.append('..')
 from data.data_generator import generate_supply_chain_data
+from utils.translations import _
 
 def show():
-    st.title("📊 Live Risk Dashboard")
-    st.markdown("**Real-time monitoring of supply chain risks across Tamil Nadu**")
+    st.title(_("📊 Live Risk Dashboard Page"))
+    st.markdown(f"**{_('Real-time monitoring of supply chain risks across Tamil Nadu')}**")
     
     # Load data
     data = generate_supply_chain_data()
     suppliers_df = data['suppliers']
     risk_events = data['risk_events']
     
+    company_profile = data.get('company_profile')
+    if company_profile:
+        st.info(f"🏢 **{_('Active Company Profile')}**: {company_profile.get('name', 'N/A')} | **{_('Avg Revenue')}**: ₹{company_profile.get('avg_revenue_lakhs', 0)}L")
+
+    
     # Risk Summary Cards
-    st.markdown("### 🎯 Current Risk Status")
+    st.markdown(f"### {_('Current Risk Status')}")
     col1, col2, col3, col4 = st.columns(4)
     
     high_risks = len(risk_events[risk_events['severity'] == 'High'])
@@ -27,7 +32,7 @@ def show():
         st.markdown(f"""
         <div style='background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%); padding: 20px; border-radius: 10px; text-align: center;'>
             <h2 style='color: white; margin: 0; font-size: 2.5em;'>{high_risks}</h2>
-            <p style='color: white; margin: 5px 0 0 0;'>🔴 High Risk Alerts</p>
+            <p style='color: white; margin: 5px 0 0 0;'>{_('High Risk Alerts')}</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -35,7 +40,7 @@ def show():
         st.markdown(f"""
         <div style='background: linear-gradient(135deg, #ffaa00 0%, #ff8800 100%); padding: 20px; border-radius: 10px; text-align: center;'>
             <h2 style='color: white; margin: 0; font-size: 2.5em;'>{medium_risks}</h2>
-            <p style='color: white; margin: 5px 0 0 0;'>🟡 Medium Risk Alerts</p>
+            <p style='color: white; margin: 5px 0 0 0;'>{_('Medium Risk Alerts')}</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -43,7 +48,7 @@ def show():
         st.markdown(f"""
         <div style='background: linear-gradient(135deg, #44ff44 0%, #00cc00 100%); padding: 20px; border-radius: 10px; text-align: center;'>
             <h2 style='color: white; margin: 0; font-size: 2.5em;'>{low_risks}</h2>
-            <p style='color: white; margin: 5px 0 0 0;'>🟢 Low Risk Alerts</p>
+            <p style='color: white; margin: 5px 0 0 0;'>{_('Low Risk Alerts')}</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -52,14 +57,14 @@ def show():
         st.markdown(f"""
         <div style='background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); padding: 20px; border-radius: 10px; text-align: center;'>
             <h2 style='color: white; margin: 0; font-size: 2.5em;'>{avg_prob:.0f}%</h2>
-            <p style='color: white; margin: 5px 0 0 0;'>📊 Avg Probability</p>
+            <p style='color: white; margin: 5px 0 0 0;'>{_('Avg Probability')}</p>
         </div>
         """, unsafe_allow_html=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Interactive Map
-    st.markdown("### 🗺️ Geographic Risk Map - Tamil Nadu Ports & Suppliers")
+    st.markdown(f"### {_('Geographic Risk Map - Tamil Nadu Ports & Suppliers')}")
     
     # Create map with risk levels
     fig = go.Figure()
@@ -72,7 +77,7 @@ def show():
         'Low': '#44ff44'
     }
     
-    for _, supplier in suppliers_df.iterrows():
+    for idx, supplier in suppliers_df.iterrows():
         color = risk_colors.get(supplier['risk_zone'], '#00d4ff')
         size = 20 if supplier['tier'] == 1 else 15
         
@@ -106,9 +111,9 @@ def show():
     st.plotly_chart(fig, use_container_width=True)
     
     # Live Risk Events Table
-    st.markdown("### ⚠️ Active Risk Events")
+    st.markdown(f"### {_('Active Risk Events')}")
     
-    for _, event in risk_events.iterrows():
+    for idx, event in risk_events.iterrows():
         severity_color = {'High': '#ff4444', 'Medium': '#ffaa00', 'Low': '#44ff44'}[event['severity']]
         severity_icon = {'High': '🔴', 'Medium': '🟡', 'Low': '🟢'}[event['severity']]
         
@@ -116,13 +121,13 @@ def show():
         <div style='background: #1a1a2e; padding: 20px; border-radius: 10px; margin: 10px 0; border-left: 5px solid {severity_color};'>
             <div style='display: flex; justify-content: space-between; align-items: center;'>
                 <div>
-                    <h4 style='color: {severity_color}; margin: 0;'>{severity_icon} {event['port']} - {event['type']}</h4>
-                    <p style='color: #a0a0a0; margin: 5px 0;'>{event['description']}</p>
-                    <p style='color: #00d4ff; margin: 5px 0;'><strong>Expected Impact:</strong> {event['impact']}</p>
+                    <h4 style='color: {severity_color}; margin: 0;'>{severity_icon} {_(f"{event['port']} - {event['type']}")}</h4>
+                    <p style='color: #a0a0a0; margin: 5px 0;'>{_(event['description'])}</p>
+                    <p style='color: #00d4ff; margin: 5px 0;'><strong>{_('Expected Impact:')}</strong> {_(event['impact'])}</p>
                 </div>
                 <div style='text-align: right;'>
                     <h2 style='color: white; margin: 0;'>{event['probability']*100:.0f}%</h2>
-                    <p style='color: #a0a0a0; margin: 0; font-size: 0.9em;'>Probability</p>
+                    <p style='color: #a0a0a0; margin: 0; font-size: 0.9em;'>{_('Probability:')}</p>
                 </div>
             </div>
         </div>
@@ -131,7 +136,7 @@ def show():
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Risk Trend Chart
-    st.markdown("### 📈 Risk Probability Trends")
+    st.markdown(f"### {_('Risk Probability Trends')}")
     
     col1, col2 = st.columns(2)
     

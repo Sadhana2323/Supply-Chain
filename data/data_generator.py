@@ -2,9 +2,11 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 
+import streamlit as st
+
 # Generate realistic Tamil Nadu supply chain data
 def generate_supply_chain_data():
-    """Generate synthetic supply chain network data for Tamil Nadu"""
+    """Generate synthetic supply chain network data for Tamil Nadu, merged with User Data if available"""
     
     # Suppliers with Tamil Nadu context
     suppliers = [
@@ -55,12 +57,54 @@ def generate_supply_chain_data():
         {"id": "C003", "name": "Middle East Distributors", "region": "Middle East", "products": ["P001", "P003"], "revenue_monthly": 600000},
     ]
     
+    # Optional Company Profile
+    company_context = None
+
+    # Merge user data if authenticated and onboarded
+    try:
+        if st.session_state.get('authenticated', False) and st.session_state.get('onboarded', False):
+            username = st.session_state.get('username')
+            # Fallback to local import to avoid circular dependencies
+            from data import auth_db
+            user_data = auth_db.get_user(username)
+            if user_data and 'company_data' in user_data:
+                c_data = user_data['company_data']
+                company_context = c_data.get('profile', {})
+                
+                # Append Custom Suppliers
+                for i, sup in enumerate(c_data.get('suppliers', [])):
+                    new_id = f"U{str(i).zfill(3)}"
+                    suppliers.append({
+                        "id": new_id,
+                        "name": sup.get("Supplier Name", "Unknown Supplier"),
+                        "type": "Custom User Node",
+                        "location": sup.get("Location (City, State)", "Unknown"),
+                        "lat": 12.0 + (np.random.random() * 2), # Default rough TN boundary coordinate generator
+                        "lon": 78.0 + (np.random.random() * 2),
+                        "tier": 1 if "Tier 1" in str(sup.get("Supplier Tier")) else 2 if "Tier 2" in str(sup.get("Supplier Tier")) else 3,
+                        "risk_zone": "Moderate" # Defaulting for user nodes unless calculated elsewhere
+                    })
+                    
+                    # Create arbitrary links to the primary ports to ensure network connects
+                    ports = c_data.get('logistics', {}).get('primary_ports', ["Chennai Port"])
+                    port_id = "S001" if "Chennai" in ports[0] else "S002"
+                    dependencies.append({
+                        "from": new_id, 
+                        "to": port_id, 
+                        "product": sup.get("Products Supplied", "Mixed"), 
+                        "lead_time": int(sup.get("Lead Time (Days)", 5)), 
+                        "single_source": "Single" in str(sup.get("Sourcing Type"))
+                    })
+    except Exception as e:
+        pass # Ignore Streamlit missing state exceptions during pure functional calls or tests
+    
     return {
         "suppliers": pd.DataFrame(suppliers),
         "dependencies": pd.DataFrame(dependencies),
         "risk_events": pd.DataFrame(risk_events),
         "products": pd.DataFrame(products),
-        "customers": pd.DataFrame(customers)
+        "customers": pd.DataFrame(customers),
+        "company_profile": company_context
     }
 
 def generate_historical_disruptions():

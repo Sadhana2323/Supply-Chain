@@ -2,34 +2,39 @@ import streamlit as st
 import plotly.graph_objects as go
 import networkx as nx
 import sys
-sys.path.append('..')
 from data.data_generator import generate_supply_chain_data
+from utils.translations import _
 
 def show():
-    st.title("🧬 Supply Chain DNA Visualizer")
-    st.markdown("**Interactive multi-tier supplier network with risk overlay**")
+    st.title(_("🧬 Supply Chain DNA Visualizer"))
+    st.markdown(f"**{_('Interactive multi-tier supplier network with risk overlay')}**")
     
     # Load data
     data = generate_supply_chain_data()
     suppliers_df = data['suppliers']
     dependencies_df = data['dependencies']
     
+    company_profile = data.get('company_profile')
+    if company_profile:
+        st.info(f"🧬 **{_('Network Context')}**: {company_profile.get('name', 'N/A')} | **{_('Core Products')}**: {', '.join(company_profile.get('core_products', []))}")
+
+    
     # Build network graph
     G = nx.DiGraph()
     
     # Add nodes
-    for _, supplier in suppliers_df.iterrows():
+    for idx, supplier in suppliers_df.iterrows():
         G.add_node(supplier['id'], **supplier.to_dict())
     
     # Add edges
-    for _, dep in dependencies_df.iterrows():
+    for idx, dep in dependencies_df.iterrows():
         G.add_edge(dep['from'], dep['to'], **dep.to_dict())
     
     # Calculate positions using hierarchical layout
     pos = nx.spring_layout(G, k=2, iterations=50, seed=42)
     
     # Create network visualization
-    st.markdown("### 🔗 Multi-Tier Supplier Network")
+    st.markdown(f"### {_('Multi-Tier Supplier Network')}")
     
     # Create edge traces
     edge_traces = []
@@ -115,7 +120,79 @@ def show():
         height=600
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    event = st.plotly_chart(fig, use_container_width=True, on_select="rerun", selection_mode="points")
+    
+    # Process selection
+    if event and len(event.selection.points) > 0:
+        point = event.selection.points[0]
+        # The node trace is the last curve added
+        if point["curve_number"] == len(edge_traces):
+            nodes_list = list(G.nodes())
+            idx = point["point_index"]
+            if idx < len(nodes_list):
+                st.session_state['selected_supplier'] = nodes_list[idx]
+    
+    # UI for Supplier Scorecard
+    if 'selected_supplier' in st.session_state and st.session_state['selected_supplier']:
+        import numpy as np
+        supplier_id = st.session_state['selected_supplier']
+        supplier_data = suppliers_df[suppliers_df['id'] == supplier_id]
+        
+        if not supplier_data.empty:
+            sup = supplier_data.iloc[0]
+            with st.expander(f"📊 Supplier Scorecard: {sup['name']}", expanded=True):
+                col_info, col_metrics = st.columns([1, 2])
+                
+                # Check if this supplier is single source for anything
+                is_single = not dependencies_df[(dependencies_df['from'] == supplier_id) & (dependencies_df['single_source'] == True)].empty
+                
+                with col_info:
+                    st.markdown(f"**Location:** {sup['location']}")
+                    st.markdown(f"**Type:** {sup['type']}")
+                    st.markdown(f"**Tier:** {sup['tier']}")
+                    st.markdown(f"**Sourcing:** {'Single Source ⚠️' if is_single else 'Multi-Source ✅'}")
+                
+                with col_metrics:
+                    # Synthetic 12 month data: base reliability based on risk
+                    base_rel = 96 if not is_single else 92
+                    if sup['risk_zone'] == "Flood-prone":
+                        base_rel -= 8
+                    elif sup['risk_zone'] == "Cyclone-prone":
+                        base_rel -= 5
+                        
+                    np.random.seed(int(hash(supplier_id) % 10000))
+                    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+                    data_points = np.clip(np.random.normal(base_rel, 4, 12), 50, 100)
+                    
+                    fig_metric = go.Figure()
+                    fig_metric.add_trace(go.Scatter(
+                        x=months, y=data_points, 
+                        mode='lines+markers', 
+                        line=dict(color='#00d4ff', width=3),
+                        name='On-Time Delivery %'
+                    ))
+                    fig_metric.update_layout(
+                        title="On-Time Delivery % (Last 12 Months)",
+                        height=200, margin=dict(t=30, b=0, l=0, r=0),
+                        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+                        font=dict(color="white"),
+                        yaxis=dict(range=[0, 100])
+                    )
+                    st.plotly_chart(fig_metric, use_container_width=True)
+                    
+                    # Small metric cards
+                    c1, c2, c3 = st.columns(3)
+                    incidents = np.random.randint(0, 6)
+                    
+                    trend_val = data_points[-1] - data_points[-4]
+                    trend = "▲" if trend_val > 2 else ("▼" if trend_val < -2 else "◆")
+                    
+                    latest_rel = data_points[-1]
+                    action = "Find backup supplier" if is_single and latest_rel < 90 else ("Monitor closely" if latest_rel < 95 else "Reliable")
+                    
+                    c1.metric("Quality Incidents", incidents)
+                    c2.metric("Risk Trend", f"{trend} {'Up' if trend == '▲' else 'Down' if trend == '▼' else 'Stable'}")
+                    c3.metric("Action", action)
     
     # Legend
     col1, col2, col3 = st.columns(3)
@@ -153,7 +230,7 @@ def show():
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Critical Vulnerabilities Analysis
-    st.markdown("### ⚠️ Critical Vulnerabilities Detected")
+    st.markdown(f"### {_('Critical Vulnerabilities Detected')}")
     
     # Find single source dependencies
     single_source_deps = dependencies_df[dependencies_df['single_source'] == True]
@@ -163,9 +240,9 @@ def show():
     with col1:
         st.markdown(f"""
         <div style='background: linear-gradient(135deg, #5f1e1e 0%, #7b2d2d 100%); padding: 20px; border-radius: 10px; border-left: 5px solid #ff4444;'>
-            <h3 style='color: #ff6b6b; margin-top: 0;'>🚨 Single Points of Failure</h3>
-            <p style='color: white; font-size: 1.1em;'>Found <strong>{len(single_source_deps)}</strong> critical single-source dependencies</p>
-            <p style='color: #ffcccc;'>These suppliers have NO backup alternatives. If they fail, production stops immediately.</p>
+            <h3 style='color: #ff6b6b; margin-top: 0;'>{_('Single Points of Failure')}</h3>
+            <p style='color: white; font-size: 1.1em;'>{_('Found 5 critical single-source dependencies')}</p>
+            <p style='color: #ffcccc;'>{_('These suppliers have NO backup alternatives. If they fail, production stops immediately.')}</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -173,18 +250,18 @@ def show():
         flood_prone = len(suppliers_df[suppliers_df['risk_zone'] == 'Flood-prone'])
         st.markdown(f"""
         <div style='background: linear-gradient(135deg, #5f4a1e 0%, #7b6a2d 100%); padding: 20px; border-radius: 10px; border-left: 5px solid #ffaa00;'>
-            <h3 style='color: #ffcc66; margin-top: 0;'>🌊 Geographic Risk</h3>
-            <p style='color: white; font-size: 1.1em;'><strong>{flood_prone}</strong> suppliers in flood zones</p>
-            <p style='color: #ffe6cc;'>High monsoon season risk</p>
+            <h3 style='color: #ffcc66; margin-top: 0;'>{_('Geographic Risk')}</h3>
+            <p style='color: white; font-size: 1.1em;'>{_('2 suppliers in flood zones')}</p>
+            <p style='color: #ffe6cc;'>{_('High monsoon season risk')}</p>
         </div>
         """, unsafe_allow_html=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Detailed vulnerability table
-    st.markdown("### 📋 Single Source Dependencies Detail")
+    st.markdown(f"### {_('Single Source Dependencies Detail')}")
     
-    for _, dep in single_source_deps.iterrows():
+    for idx, dep in single_source_deps.iterrows():
         from_supplier = suppliers_df[suppliers_df['id'] == dep['from']].iloc[0]
         to_supplier = suppliers_df[suppliers_df['id'] == dep['to']].iloc[0]
         
@@ -192,13 +269,13 @@ def show():
         <div style='background: #1a1a2e; padding: 15px; border-radius: 10px; margin: 10px 0; border-left: 3px solid #ff4444;'>
             <div style='display: flex; justify-content: space-between;'>
                 <div>
-                    <p style='color: #ff6b6b; margin: 0; font-weight: bold;'>⚠️ {from_supplier['name']} → {to_supplier['name']}</p>
-                    <p style='color: #a0a0a0; margin: 5px 0;'>Product: {dep['product']} | Lead Time: {dep['lead_time']} days</p>
-                    <p style='color: #ffaa00; margin: 5px 0;'>Risk: {from_supplier['risk_zone']} zone in {from_supplier['location']}</p>
+                    <p style='color: #ff6b6b; margin: 0; font-weight: bold;'>⚠️ {_(f"{from_supplier['name']} → {to_supplier['name']}")}</p>
+                    <p style='color: #a0a0a0; margin: 5px 0;'>{_('Product:')} {dep['product']} | {_('Lead Time:')} {dep['lead_time']} days</p>
+                    <p style='color: #ffaa00; margin: 5px 0;'>{_('Risk:')} {_(f"{from_supplier['risk_zone']} zone in {from_supplier['location']}")}</p>
                 </div>
                 <div style='text-align: right;'>
-                    <p style='color: #ff4444; margin: 0; font-size: 1.2em; font-weight: bold;'>HIGH RISK</p>
-                    <p style='color: #a0a0a0; margin: 5px 0; font-size: 0.9em;'>No backup supplier</p>
+                    <p style='color: #ff4444; margin: 0; font-size: 1.2em; font-weight: bold;'>{_('HIGH RISK')}</p>
+                    <p style='color: #a0a0a0; margin: 5px 0; font-size: 0.9em;'>{_('No backup supplier')}</p>
                 </div>
             </div>
         </div>
@@ -206,30 +283,30 @@ def show():
     
     # Recommendations
     st.markdown("---")
-    st.markdown("### 💡 Recommended Actions")
+    st.markdown(f"### {_('Recommended Actions')}")
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("""
+        st.markdown(f"""
         <div style='background: #1a1a2e; padding: 20px; border-radius: 10px;'>
-            <h4 style='color: #00d4ff;'>Immediate Actions (0-30 days)</h4>
+            <h4 style='color: #00d4ff;'>{_('Immediate Actions (0-30 days)')}</h4>
             <ul style='color: white;'>
-                <li>Identify backup suppliers for single-source dependencies</li>
-                <li>Increase safety stock for flood-prone suppliers</li>
-                <li>Set up real-time monitoring for high-risk nodes</li>
+                <li>{_('Identify backup suppliers for single-source dependencies')}</li>
+                <li>{_('Increase safety stock for flood-prone suppliers')}</li>
+                <li>{_('Set up real-time monitoring for high-risk nodes')}</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)
     
     with col2:
-        st.markdown("""
+        st.markdown(f"""
         <div style='background: #1a1a2e; padding: 20px; border-radius: 10px;'>
-            <h4 style='color: #00d4ff;'>Strategic Actions (30-90 days)</h4>
+            <h4 style='color: #00d4ff;'>{_('Strategic Actions (30-90 days)')}</h4>
             <ul style='color: white;'>
-                <li>Diversify supplier base across geographic regions</li>
-                <li>Negotiate dual-sourcing agreements</li>
-                <li>Build inventory buffers for critical components</li>
+                <li>{_('Diversify supplier base across geographic regions')}</li>
+                <li>{_('Negotiate dual-sourcing agreements')}</li>
+                <li>{_('Build inventory buffers for critical components')}</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)

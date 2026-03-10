@@ -27,9 +27,9 @@ optimizer = WhatIfOptimizer(data['products'])
 print(f"   [OK] Initialized what-if optimizer")
 
 # Test pages import
-print("\n3. Testing page modules...")
-from pages import landing, risk_dashboard, dna_visualizer, cascade_simulator, whatif_optimizer, case_studies
-print("   [OK] All page modules loaded successfully")
+print("\n3. Testing view modules...")
+from views import landing, risk_dashboard, dna_visualizer, cascade_simulator, whatif_optimizer, case_studies
+print("   [OK] All view modules loaded successfully")
 
 print("\n[SUCCESS] All tests passed! Application is ready to run.")
 print("\nTo start the application, run:")
