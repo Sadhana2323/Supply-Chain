@@ -92,23 +92,29 @@ def show():
         ))
     
     fig.update_geos(
-        center=dict(lat=11.0, lon=78.5),
-        projection_scale=8,
+        fitbounds="locations",
         visible=True,
         showcountries=True,
         countrycolor="darkgray"
     )
     
     fig.update_layout(
-        height=500,
+        height=450,
         margin={"r":0,"t":0,"l":0,"b":0},
         paper_bgcolor='#0e1117',
         geo=dict(bgcolor='#1a1a2e'),
         showlegend=True,
-        legend=dict(bgcolor='#1a1a2e', font=dict(color='white'))
+        legend=dict(
+            bgcolor='rgba(26, 26, 46, 0.8)',
+            font=dict(color='white'),
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.01
+        )
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
     
     # Live Risk Events Table
     st.markdown(f"### {_('Active Risk Events')}")
