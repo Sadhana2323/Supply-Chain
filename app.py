@@ -50,111 +50,49 @@ st.markdown("""
         /* Hide streamlit's native desktop sidebar toggle icon */
         [data-testid="collapsedControl"] { display: none !important; }
 
-        /* Ensure main content is full width */
+        /* Simplify Main Container */
         .block-container {
-            padding: 1rem 1rem !important;
+            padding: 4rem 1rem 1rem 1rem !important; /* Extra top padding for mobile */
+            max-width: 100vw !important;
+            overflow-x: hidden !important;
         }
 
-        /* Enforce horizontal scrolling on tables */
-        .stDataFrame, [data-testid="stTable"] {
-            overflow-x: auto !important;
-            display: block !important;
+        /* Prevent text overlapping and scaling issues */
+        * {
+            word-wrap: break-word !important;
+            white-space: normal !important;
         }
-
-        /* Responsive typography */
-        h1 { font-size: 1.8rem !important; }
-        h2 { font-size: 1.5rem !important; }
-        h3 { font-size: 1.2rem !important; }
-        p, li, span, div { font-size: 16px !important; }
+        
+        h1 { font-size: 1.8rem !important; line-height: 1.2 !important;}
+        h2 { font-size: 1.4rem !important; line-height: 1.2 !important;}
+        h3 { font-size: 1.2rem !important; line-height: 1.2 !important;}
+        p, li, span, div, label, .stRadio { font-size: 14px !important; }
 
         /* Ensure accessible touch targets */
         button, .stButton>button {
             min-height: 44px !important;
-            min-width: 44px !important;
-            padding: 10px !important;
+            padding: 8px !important;
         }
 
-        /* Sidebar Overlay System Strategy */
+        /* Allow Streamlit's native mobile sidebar behavior */
         section[data-testid="stSidebar"] {
-            position: fixed !important;
-            top: 0;
-            left: 0;
-            height: 100vh !important;
-            z-index: 999999 !important;
-            transition: transform 0.3s ease-in-out !important;
-            /* Default closed state */
-            transform: translateX(-100%);
+            width: 80vw !important;
+            max-width: 300px !important;
         }
 
-        /* JS toggled active class */
-        section[data-testid="stSidebar"].mobile-active {
-            transform: translateX(0) !important;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        /* Tables and charts scroll natively */
+        .js-plotly-plot, .stDataFrame, [data-testid="stTable"] {
+            width: 100% !important;
+            overflow-x: auto !important;
         }
-
-        /* Hamburger Styles */
-        #custom-hamburger {
-            display: flex !important;
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            z-index: 9999999;
-            background: #1e3a5f;
-            color: #00d4ff;
-            border: 1px solid #00d4ff;
-            border-radius: 5px;
-            width: 44px;
-            height: 44px;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        
+        /* Fix Top menu overlap on mobile */
+        .top-menu, div.stPopover {
+            margin-bottom: 10px !important;
         }
-    }
-
-    /* Desktoop Default: Hide hamburger completely */
-    #custom-hamburger {
-        display: none;
     }
 </style>
 """, unsafe_allow_html=True)
-
-# Custom JS and HTML for Mobile Hamburger Setup
-import streamlit.components.v1 as components
-components.html("""
-<script>
-    // Execute setup continuously to catch streamlit repaints correctly
-    setInterval(function(){
-        // Get parent DOM (the Actual Streamlit App Body)
-        var parentDoc = window.parent.document;
-        // Check if hamburger already exists
-        if (!parentDoc.getElementById('custom-hamburger')) {
-            // Create hamburger element
-            var btn = parentDoc.createElement('div');
-            btn.id = 'custom-hamburger';
-            btn.innerHTML = '☰';
-            
-            // Toggle Logic
-            btn.onclick = function() {
-                var sidebar = parentDoc.querySelector('section[data-testid="stSidebar"]');
-                if (sidebar) {
-                    sidebar.classList.toggle('mobile-active');
-                    if(sidebar.classList.contains('mobile-active')) {
-                        btn.innerHTML = '✖';
-                    } else {
-                        btn.innerHTML = '☰';
-                    }
-                }
-            };
-            
-            // Append to Streamlit body
-            parentDoc.body.appendChild(btn);
-        }
-    }, 1000);
-</script>
-""", height=0, width=0)
-
 # Top Bar with Profile & Language Options
 col_spacer, col_menu = st.columns([8, 1])
 with col_menu:
@@ -199,13 +137,6 @@ st.sidebar.title(_("🌐 Supply Chain Control Tower"))
 
 # Authentication Routing Logic
 if not st.session_state['authenticated']:
-    # Completely hide the sidebar area using CSS injection
-    st.markdown("""
-        <style>
-            [data-testid="collapsedControl"] { display: none !important; }
-            section[data-testid="stSidebar"] { display: none !important; }
-        </style>
-    """, unsafe_allow_html=True)
     auth.show()
 elif not st.session_state['onboarded'] or st.session_state.get('editing_mode', False):
     # User is logged in but hasn't filled out company data, or is editing it
