@@ -6,7 +6,7 @@ from pathlib import Path
 st.set_page_config(page_title="Supply Chain Control Tower", layout="wide", initial_sidebar_state="expanded")
 
 # Import views
-from views import landing, risk_dashboard, dna_visualizer, cascade_simulator, whatif_optimizer, case_studies, chatbot, auth, onboarding, sustainability
+from views import landing, risk_dashboard, dna_visualizer, cascade_simulator, whatif_optimizer, chatbot, auth, onboarding, sustainability
 from utils.translations import _
 from utils.role_helper import is_action_allowed
 
@@ -177,7 +177,6 @@ else:
         "DNA Visualizer": "🧬",
         "Cascade Simulator": "⚡",
         "What-If Optimizer": "🎯",
-        "Tamil Nadu Case Studies": "📚",
         "Sustainability": "🌱",
         "AI Chat Assistant": "💬"
     }
@@ -199,8 +198,6 @@ else:
         cascade_simulator.show()
     elif page_key == "What-If Optimizer":
         whatif_optimizer.show()
-    elif page_key == "Tamil Nadu Case Studies":
-        case_studies.show()
     elif page_key == "Sustainability":
         sustainability.show()
     elif page_key == "AI Chat Assistant":
