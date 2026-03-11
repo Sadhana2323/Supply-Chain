@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Supply Chain Risk</string>
+    <!-- We point the WebView to Streamlit default port on the host machine via the Android emulator's 10.0.2.2 alias or the user's local network IP.-->
+    <!-- For a production app, change this to your deployed online Streamlit URL (e.g., https://my-streamlit-app.com) -->
+    <string name="webapp_url">http://10.0.2.2:8501</string>
+</resources>
